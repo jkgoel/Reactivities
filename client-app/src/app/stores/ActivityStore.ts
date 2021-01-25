@@ -9,7 +9,7 @@ class ActivityStore {
   }
 
   activityRegistry = new Map();
-  selectedActivity: IActivity | undefined;
+  activity: IActivity | null = null;
   loadingInitial = true;
   editMode = false;
   submitting = false;
@@ -41,8 +41,31 @@ class ActivityStore {
   };
 
   selectActivity = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id);
+    this.activity = this.activityRegistry.get(id);
     this.editMode = false;
+  };
+
+  loadActivity = async (id: string) => {
+    this.activity = this.activityRegistry.get(id);
+    if (!this.activity) {
+      this.loadingInitial = true;
+      try {
+        const response = await agent.Activities.details(id);
+        runInAction(() => {
+          this.activity = response;
+          this.loadingInitial = false;
+        });
+      } catch (error) {
+        runInAction(() => {
+          console.log(error);
+          this.loadingInitial = false;
+        });
+      }
+    }
+  };
+
+  clearActivity = () => {
+    this.activity = null;
   };
 
   createActivity = async (activity: IActivity) => {
@@ -51,7 +74,7 @@ class ActivityStore {
       await agent.Activities.create(activity);
       runInAction(() => {
         this.activityRegistry.set(activity.id, activity);
-        this.selectedActivity = activity;
+        this.activity = activity;
         this.editMode = false;
         this.submitting = false;
       });
@@ -69,7 +92,7 @@ class ActivityStore {
       await agent.Activities.update(activity);
       runInAction(() => {
         this.activityRegistry.set(activity.id, activity);
-        this.selectedActivity = activity;
+        this.activity = activity;
         this.editMode = false;
         this.submitting = false;
       });
@@ -84,12 +107,11 @@ class ActivityStore {
   deleteActivity = async (event: SyntheticEvent<HTMLButtonElement>, id: string) => {
     this.submitting = true;
     this.target = event.currentTarget.name;
-    console.log(`${this.target} : ${this.submitting}`);
     try {
       await agent.Activities.delete(id);
       runInAction(() => {
         this.activityRegistry.delete(id);
-        this.selectedActivity = undefined;
+        this.activity = null;
         this.submitting = false;
         this.target = '';
       });
@@ -100,16 +122,6 @@ class ActivityStore {
         this.target = '';
       });
     }
-  };
-
-  openActivityForm = (isNewActivity: boolean = false) => {
-    this.editMode = true;
-    if (isNewActivity) this.selectedActivity = undefined;
-  };
-
-  closeActivityForm = () => {
-    this.editMode = false;
-    this.selectedActivity = undefined;
   };
 }
 
