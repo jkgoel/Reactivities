@@ -4,10 +4,22 @@ import 'semantic-ui-css/semantic.min.css';
 import './app/layout/styles.css';
 import App from './app/layout/App';
 import reportWebVitals from './reportWebVitals';
+import { createBrowserHistory } from 'history';
+import { store, StoreContext } from './app/stores/store';
+import { Router } from 'react-router-dom';
+import ScrollToTop from './app/layout/ScrollToTop';
+
+export const history = createBrowserHistory();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Router history={history}>
+      <ScrollToTop>
+        <StoreContext.Provider value={store}>
+          <App />
+        </StoreContext.Provider>
+      </ScrollToTop>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
