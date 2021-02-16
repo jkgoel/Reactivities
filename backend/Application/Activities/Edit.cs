@@ -50,10 +50,9 @@ namespace Application.Activities
 
                 _mapper.Map(request.Activity, activity);
 
-
                 var success = await _context.SaveChangesAsync() > 0;
 
-                return success ? Unit.Value : throw new Exception("Problem creating new activity");
+                return success ? Unit.Value : throw new Exception("Problem updating new activity");
 
 
             }

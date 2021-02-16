@@ -1,5 +1,7 @@
+using API.Extensions;
 using API.Middleware;
 using Application.Activities;
+using Application.Core;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -10,19 +12,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Presistence;
-using Application.Core;
-using API.Extensions;
 
 namespace API
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _config = configuration;
+
         }
 
-        public IConfiguration Configuration { get; }
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -33,7 +35,7 @@ namespace API
                 cfg.RegisterValidatorsFromAssemblyContaining<Create>();
             });
 
-            services.AddApplicationServices(Configuration);
+            services.AddApplicationServices(_config);
 
         }
 

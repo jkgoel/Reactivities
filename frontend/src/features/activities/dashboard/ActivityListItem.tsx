@@ -15,22 +15,24 @@ function ActivityListItem({ activity }: Props) {
           <Item>
             <Item.Image size='tiny' circular src='/assets/user.png' />
             <Item.Content>
-              <Item.Header as='a'>{activity.title}</Item.Header>
+              <Item.Header as={Link} to={`/activities/${activity.id}`}>
+                {activity.title}
+              </Item.Header>
               <Item.Description>Hosted By Bob</Item.Description>
             </Item.Content>
           </Item>
         </Item.Group>
       </Segment>
       <Segment>
-        <Icon name='clock outline' />
-        {activity.date}
-        <Icon name='map marker alternate' />
-        {activity.venue}, {activity.city}
+        <span>
+          <Icon name='clock outline' /> {activity.date}
+          <Icon name='map marker alternate' /> {activity.venue}, {activity.city}
+        </span>
       </Segment>
       <Segment secondary>Attendees will go here</Segment>
       <Segment clearing>
         <span>{activity.description}</span>
-        <Button floated='right' content='View' color='blue' as={Link} to={`/activities/${activity.id}`} />
+        <Button floated='right' content='View' color='teal' as={Link} to={`/activities/${activity.id}`} />
       </Segment>
     </Segment.Group>
   );

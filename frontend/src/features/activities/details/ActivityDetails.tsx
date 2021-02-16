@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 import ActivityDetailHeader from './ActivityDetailHeader';
 import ActivityDetailInfo from './ActivityDetailInfo';
@@ -9,19 +9,16 @@ import ActivityDetailChat from './ActivityDetailChat';
 import ActivityDetailSidebar from './ActivityDetailSidebar';
 import { useStore } from 'src/app/stores/store';
 
-interface DetailParams {
-  id: string;
-}
-
-function ActivityDetails({ match, history }: RouteComponentProps<DetailParams>) {
+function ActivityDetails() {
   const { activityStore } = useStore();
-  const { activity, loadActivity, loadingInitial } = activityStore;
+  const { selectedActivity: activity, loadActivity, loadingInitial } = activityStore;
+  const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
-    loadActivity(match.params.id);
-  }, [loadActivity, match.params.id, history]);
+    loadActivity(id);
+  }, [id, loadActivity]);
 
-  if (loadingInitial) return <LoadingComponent content='Loading Activity' />;
+  if (loadingInitial) return <LoadingComponent content='loading activity...' />;
 
   if (!activity) return <h1>Activity Not Found</h1>;
 

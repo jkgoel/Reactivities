@@ -3,15 +3,16 @@ import { Container } from 'semantic-ui-react';
 import NavBar from '../../features/nav/NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import { observer } from 'mobx-react-lite';
-import { Route, withRouter, Switch } from 'react-router-dom';
-import { RouteComponentProps } from 'react-router';
+import { Route, Switch } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import HomePage from '../../features/home/HomePage';
 import ActivityForm from '../../features/activities/form/ActivityForm';
 import ActivityDetails from '../../features/activities/details/ActivityDetails';
 import NotFound from './NotFound';
 import { ToastContainer } from 'react-toastify';
 
-function App({ location }: RouteComponentProps) {
+function App() {
+  const location = useLocation();
   return (
     <>
       <ToastContainer position='bottom-right' />
@@ -36,4 +37,4 @@ function App({ location }: RouteComponentProps) {
   );
 }
 
-export default withRouter(observer(App));
+export default observer(App);
