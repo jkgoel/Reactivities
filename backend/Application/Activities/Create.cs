@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Core;
 using Domain;
 using FluentValidation;
 using MediatR;
@@ -11,7 +12,7 @@ namespace Application.Activities
     public class Create
     {
 
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity { get; set; }
         }
@@ -20,15 +21,10 @@ namespace Application.Activities
         {
             public CommandValidator()
             {
-                RuleFor(x => x.Activity.Title).NotEmpty();
-                RuleFor(x => x.Activity.Description).NotEmpty();
-                RuleFor(x => x.Activity.Category).NotEmpty();
-                RuleFor(x => x.Activity.Date).NotEmpty();
-                RuleFor(x => x.Activity.City).NotEmpty();
-                RuleFor(x => x.Activity.Venue).NotEmpty();
+                RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
             }
         }
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command,Result<Unit>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
@@ -36,14 +32,14 @@ namespace Application.Activities
                 _context = context;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-
-
                 _context.Activities.Add(request.Activity);
                 var success = await _context.SaveChangesAsync() > 0;
 
-                return success ? Unit.Value : throw new Exception("Problem creating new activity");
+                if(!success) return Result<Unit>.Failure("Problem creating new activity");
+
+                return Result<Unit>.Success(Unit.Value);
 
 
             }

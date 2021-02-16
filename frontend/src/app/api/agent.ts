@@ -1,7 +1,8 @@
-import { history } from './../../index';
+import { store } from './../stores/store';
 import { Activity } from './../model/activity';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
+import { history } from 'src';
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -11,29 +12,45 @@ const sleep = (delay: number) => {
 
 axios.defaults.baseURL = 'https://localhost:5001/api';
 
-axios.interceptors.response.use(async (response) => {
-  try {
+axios.interceptors.response.use(
+  async (response) => {
     await sleep(1000);
     return response;
-  } catch (error) {
-    console.log(error);
+  },
+  (error: AxiosError) => {
+    const { data, status, config } = error.response!;
 
-    if (error.message === 'Network Error' && error.response === undefined) {
-      toast.error('Network Error - Please check that you are connected to internet and API is running');
+    switch (status) {
+      case 400:
+        if (typeof data === 'string') {
+          toast.error(data);
+        } else if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
+          history.push('/not-found');
+        } else if (data.errors) {
+          const modalStateErrors = [];
+          for (const key in data.errors) {
+            if (data.errors[key]) {
+              modalStateErrors.push(data.errors[key]);
+            }
+          }
+          throw modalStateErrors.flat();
+        }
+        break;
+      case 401:
+        toast.error('unathorized');
+        break;
+      case 404:
+        history.push('/not-found');
+        break;
+      case 500:
+        store.commonStore.setServerError(data);
+        history.push('/server-error');
+        break;
     }
-    const { status, data, config } = error.response;
-    if (status === 404) {
-      history.push('/notfound');
-    }
-    if (status === 400 && config.method === 'get' && data.errors.hasOwnProperty('id')) {
-      history.push('/notfound');
-    }
-    if (status === 500) {
-      toast.error('Server Error - Check the terminal for more info.');
-    }
-    return await Promise.reject(error);
+
+    return Promise.reject(error);
   }
-});
+);
 
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
