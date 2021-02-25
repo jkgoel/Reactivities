@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { Segment, Header, Form, Button, Comment } from 'semantic-ui-react';
 
@@ -47,4 +48,4 @@ function ActivityDetailChat() {
   );
 }
 
-export default ActivityDetailChat;
+export default observer(ActivityDetailChat);

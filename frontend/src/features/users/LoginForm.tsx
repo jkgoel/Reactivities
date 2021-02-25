@@ -6,13 +6,19 @@ import MyTextInput from 'src/app/common/form/MyTextInput';
 import { useStore } from 'src/app/stores/store';
 
 export default observer(function LoginForm() {
-  const { userStore } = useStore();
+  const {
+    userStore,
+    activityStore: { loadActivities },
+  } = useStore();
 
   return (
     <Formik
       initialValues={{ email: '', password: '', error: null }}
       onSubmit={(values, { setErrors }) =>
-        userStore.login(values).catch((error) => setErrors({ error: 'Invalid email for password' }))
+        userStore
+          .login(values)
+          .then(() => loadActivities())
+          .catch((error) => setErrors({ error: 'Invalid email for password' }))
       }>
       {({ handleSubmit, isSubmitting, errors }) => (
         <Form className='ui form' onSubmit={handleSubmit}>

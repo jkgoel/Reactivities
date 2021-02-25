@@ -11,25 +11,17 @@ import MyTextArea from 'src/app/common/form/MyTextArea';
 import MyTextInput from 'src/app/common/form/MyTextInput';
 import { categoryOptions } from 'src/app/common/options/categoryOptions';
 import LoadingComponent from 'src/app/layout/LoadingComponent';
-import { Activity } from 'src/app/model/activity';
+import { ActivityFormValues } from 'src/app/model/activity';
 import { useStore } from 'src/app/stores/store';
 import { v4 as uuid } from 'uuid';
 import * as Yup from 'yup';
 
 export default observer(function ActivityForm() {
   const { activityStore } = useStore();
-  const { createActivity, updateActivity, loading, loadActivity, loadingInitial } = activityStore;
+  const { createActivity, updateActivity, loadActivity, loadingInitial } = activityStore;
   const { id } = useParams<{ id: string }>();
 
-  const [activity, setActivity] = useState<Activity>({
-    id: '',
-    title: '',
-    category: '',
-    description: '',
-    date: null,
-    city: '',
-    venue: '',
-  });
+  const [activity, setActivity] = useState<ActivityFormValues>(new ActivityFormValues());
 
   const validationSchema = Yup.object({
     title: Yup.string().required(),
@@ -41,11 +33,11 @@ export default observer(function ActivityForm() {
   });
 
   useEffect(() => {
-    if (id) loadActivity(id).then((activity) => setActivity(activity!));
+    if (id) loadActivity(id).then((activity) => setActivity(new ActivityFormValues(activity)));
   }, [id, loadActivity]);
 
-  function handleFormSubmit(activity: Activity) {
-    if (activity.id.length === 0) {
+  function handleFormSubmit(activity: ActivityFormValues) {
+    if (!activity.id) {
       let newActivity = {
         ...activity,
         id: uuid(),
@@ -82,7 +74,7 @@ export default observer(function ActivityForm() {
             <MyTextInput placeholder='City' name='city' />
             <MyTextInput placeholder='Venue' name='venue' />
             <Button
-              loading={loading}
+              loading={isSubmitting}
               floated='right'
               positive
               type='submit'
@@ -91,7 +83,7 @@ export default observer(function ActivityForm() {
             />
             <Button
               as={Link}
-              to={activity.id.length === 0 ? '/activities' : `/activities/${activity.id}`}
+              to={activity.id ? `/activities/${activity.id}` : '/activities'}
               floated='right'
               type='button'
               content='Cancel'

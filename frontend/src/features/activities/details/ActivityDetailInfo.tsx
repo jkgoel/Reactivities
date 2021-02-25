@@ -1,4 +1,5 @@
 import { format } from 'date-fns/esm';
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { Segment, Grid, Icon } from 'semantic-ui-react';
 import { Activity } from 'src/app/model/activity';
@@ -46,4 +47,4 @@ function ActivityDetailInfo({ activity }: Props) {
   );
 }
 
-export default ActivityDetailInfo;
+export default observer(ActivityDetailInfo);
