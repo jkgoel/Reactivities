@@ -1,9 +1,11 @@
+import { Photo } from './../model/profile';
 import { User, UserFormValues } from './../model/user';
 import { store } from './../stores/store';
 import { Activity, ActivityFormValues } from './../model/activity';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { history } from 'src';
+import { Profile } from '../model/profile';
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -83,9 +85,21 @@ const Account = {
   register: (user: UserFormValues) => requests.post<User>('/account/register', user),
 };
 
+const Profiles = {
+  get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+  uploadPhoto: (file: Blob) => {
+    let formData = new FormData();
+    formData.append('File', file);
+    return axios.post<Photo>('/photos', formData, { headers: { 'Content-type': 'multipart/form-data' } });
+  },
+  setMainPhoto: (id: string) => requests.post<void>(`/photos/${id}/setmain`, {}),
+  deletePhoto: (id: string) => requests.del<void>(`/photos/${id}`),
+};
+
 const agent = {
   Activities,
   Account,
+  Profiles,
 };
 
 export default agent;
