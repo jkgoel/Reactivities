@@ -11,12 +11,13 @@ import { useStore } from 'src/app/stores/store';
 
 function ActivityDetails() {
   const { activityStore } = useStore();
-  const { selectedActivity: activity, loadActivity, loadingInitial } = activityStore;
+  const { selectedActivity: activity, loadActivity, loadingInitial, clearActivity } = activityStore;
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     loadActivity(id);
-  }, [id, loadActivity]);
+    return () => clearActivity();
+  }, [id, loadActivity, clearActivity]);
 
   if (loadingInitial) return <LoadingComponent content='loading activity...' />;
 

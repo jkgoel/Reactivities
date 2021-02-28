@@ -1,9 +1,9 @@
-import { Formik, Form } from 'formik';
+import { formatDistanceToNow } from 'date-fns';
+import { Formik, Form, Field, FieldProps } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Segment, Header, Button, Comment } from 'semantic-ui-react';
-import MyTextArea from 'src/app/common/form/MyTextArea';
+import { Segment, Header, Comment, Loader } from 'semantic-ui-react';
 import { useStore } from 'src/app/stores/store';
 import * as Yup from 'yup';
 
@@ -30,6 +30,36 @@ function ActivityDetailChat({ activityId }: Props) {
         <Header>Chat about this event</Header>
       </Segment>
       <Segment attached clearing>
+        <Formik
+          onSubmit={(values, { resetForm }) => commentStore.addComment(values).then(() => resetForm())}
+          initialValues={{ body: '' }}
+          validationSchema={Yup.object({ body: Yup.string().required() })}>
+          {({ isSubmitting, isValid, handleSubmit }) => (
+            <Form className='ui form'>
+              <Field name='body'>
+                {(props: FieldProps) => (
+                  <div style={{ position: 'relative' }}>
+                    <Loader active={isSubmitting} />
+                    <textarea
+                      placeholder='Enter your comment (Enter to submit, SHIFT + Enter for new line)'
+                      rows={2}
+                      {...props.field}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && e.shiftKey) {
+                          return;
+                        }
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          isValid && handleSubmit();
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </Field>
+            </Form>
+          )}
+        </Formik>
         <Comment.Group>
           {commentStore.comments.map((comment) => (
             <Comment key={comment.id}>
@@ -39,33 +69,12 @@ function ActivityDetailChat({ activityId }: Props) {
                   {comment.displayName}
                 </Comment.Author>
                 <Comment.Metadata>
-                  <div>{comment.createdAt}</div>
+                  <div>{formatDistanceToNow(comment.createdAt)} ago</div>
                 </Comment.Metadata>
-                <Comment.Text>{comment.body}</Comment.Text>
+                <Comment.Text style={{ whiteSpace: 'pre-wrap' }}>{comment.body}</Comment.Text>
               </Comment.Content>
             </Comment>
           ))}
-
-          <Formik
-            onSubmit={(values, { resetForm }) => commentStore.addComment(values).then(() => resetForm())}
-            initialValues={{ body: '' }}
-            validationSchema={Yup.object({ body: Yup.string().required() })}>
-            {({ isSubmitting, isValid }) => (
-              <Form className='ui form'>
-                <MyTextArea placeholder='Add comment' rows={2} name='body' />
-                <Button
-                  content='Add Reply'
-                  labelPosition='left'
-                  icon='edit'
-                  primary
-                  loading={isSubmitting}
-                  disabled={isSubmitting || !isValid}
-                  type='submit'
-                  floated='right'
-                />
-              </Form>
-            )}
-          </Formik>
         </Comment.Group>
       </Segment>
     </>
