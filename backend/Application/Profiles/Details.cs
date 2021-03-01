@@ -32,7 +32,7 @@ namespace Application.Profiles
             public async Task<Result<Profile>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _context.Users
-                .ProjectTo<Profile>(_mapper.ConfigurationProvider)
+                .ProjectTo<Profile>(_mapper.ConfigurationProvider, new { currentUSername = _userAccessor.GetUserName() })
                 .SingleOrDefaultAsync(u => u.Username == request.Username);
 
                 if (user is null) return null;

@@ -169,7 +169,7 @@ export default class ActivityStore {
     }
   };
 
-  cancelActivity = async () => {
+  cancelActivityToggle = async () => {
     this.loading = true;
     try {
       await agent.Activities.attend(this.selectedActivity!.id);
@@ -182,5 +182,16 @@ export default class ActivityStore {
     } finally {
       this.loading = false;
     }
+  };
+
+  updateAttendeeFollowing = (username: string) => {
+    this.activityRegistry.forEach((activity) => {
+      activity.attendees.forEach((attendee) => {
+        if (attendee.username === username) {
+          attendee.following ? attendee.followersCount-- : attendee.followersCount++;
+          attendee.following = !attendee.following;
+        }
+      });
+    });
   };
 }

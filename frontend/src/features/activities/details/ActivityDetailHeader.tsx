@@ -25,7 +25,7 @@ const activityImageTextStyle = {
 
 function ActivityDetailHeader({ activity }: Props) {
   const {
-    activityStore: { updateAttendance, cancelActivity, loading },
+    activityStore: { updateAttendance, cancelActivityToggle, loading },
   } = useStore();
   return (
     <Segment.Group>
@@ -59,7 +59,11 @@ function ActivityDetailHeader({ activity }: Props) {
       <Segment clearing attached='bottom'>
         {activity.isHost ? (
           <>
-            <Button color={activity.isCancelled ? 'green' : 'red'} basic onClick={cancelActivity} loading={loading}>
+            <Button
+              color={activity.isCancelled ? 'green' : 'red'}
+              basic
+              onClick={cancelActivityToggle}
+              loading={loading}>
               {activity.isCancelled ? 'Re-activate Activity' : 'Cancel Activity'}
             </Button>
             <Button
