@@ -1,3 +1,4 @@
+import { Pagination, PagingParams } from './../model/pagination';
 import { store } from './store';
 import { Activity, ActivityFormValues } from '../model/activity';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -10,9 +11,20 @@ export default class ActivityStore {
   selectedActivity: Activity | undefined = undefined;
   loadingInitial = true;
   loading = false;
+  pagination: Pagination | null = null;
+  pagingParam = new PagingParams();
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  setPagingParams = (pagingParam: PagingParams) => (this.pagingParam = pagingParam);
+
+  get axiosParams() {
+    const params = new URLSearchParams();
+    params.append('pageNumber', this.pagingParam.pageNumber.toString());
+    params.append('pageSize', this.pagingParam.pageSize.toString());
+    return params;
   }
 
   get activitiesByDate() {
@@ -36,16 +48,21 @@ export default class ActivityStore {
   loadActivities = async () => {
     this.loadingInitial = true;
     try {
-      const activities = await agent.Activities.list();
+      const result = await agent.Activities.list(this.axiosParams);
 
-      activities.forEach((activity) => {
+      result.data.forEach((activity) => {
         this.setActivity(activity);
       });
+      this.setPagination(result.pagination);
       this.setLoadingInitial(false);
     } catch (error) {
       console.log(error);
       this.setLoadingInitial(false);
     }
+  };
+
+  setPagination = (pagination: Pagination) => {
+    this.pagination = pagination;
   };
 
   selectActivity = (id: string) => {
