@@ -1,7 +1,7 @@
 import { Pagination, PagingParams } from './../model/pagination';
 import { store } from './store';
 import { Activity, ActivityFormValues } from '../model/activity';
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import agent from '../api/agent';
 import { format } from 'date-fns';
 import { Profile } from '../model/profile';
@@ -12,20 +12,67 @@ export default class ActivityStore {
   loadingInitial = true;
   loading = false;
   pagination: Pagination | null = null;
-  pagingParam = new PagingParams();
+  pagingParams = new PagingParams();
+  predicate = new Map().set('all', true);
 
   constructor() {
     makeAutoObservable(this);
+
+    reaction(
+      () => this.predicate.keys(),
+      () => {
+        console.log('inside reaction');
+        this.pagingParams = new PagingParams();
+        this.activityRegistry.clear();
+        this.loadActivities();
+      }
+    );
   }
 
-  setPagingParams = (pagingParam: PagingParams) => (this.pagingParam = pagingParam);
+  setPagingParams = (pagingParam: PagingParams) => (this.pagingParams = pagingParam);
 
   get axiosParams() {
+    console.log('inside axioparams');
     const params = new URLSearchParams();
-    params.append('pageNumber', this.pagingParam.pageNumber.toString());
-    params.append('pageSize', this.pagingParam.pageSize.toString());
+    params.append('pageNumber', this.pagingParams.pageNumber.toString());
+    params.append('pageSize', this.pagingParams.pageSize.toString());
+    this.predicate.forEach((value, key) => {
+      if (key === 'startDate') {
+        const date = (value as Date).toISOString();
+        console.log('ISOString', date);
+        params.append(key, date);
+      } else {
+        params.append(key, value);
+      }
+    });
     return params;
   }
+
+  setPredicate = (predicate: string, value: string | Date) => {
+    const resetPredicate = () => {
+      this.predicate.forEach((value, key) => {
+        if (key !== 'startDate') this.predicate.delete(key);
+      });
+    };
+    switch (predicate) {
+      case 'all':
+        resetPredicate();
+        this.predicate.set('all', true);
+        break;
+      case 'isGoing':
+        resetPredicate();
+        this.predicate.set('isGoing', true);
+        break;
+      case 'isHost':
+        resetPredicate();
+        this.predicate.set('isHost', true);
+        break;
+      case 'startDate':
+        this.predicate.delete('startDate');
+        this.predicate.set('startDate', value);
+        break;
+    }
+  };
 
   get activitiesByDate() {
     return Array.from(this.activityRegistry.values()).sort((a, b) => a.date!.getTime() - b.date!.getTime());
