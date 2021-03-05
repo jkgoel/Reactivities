@@ -1,5 +1,5 @@
 import { PaginatedResult } from './../model/pagination';
-import { Photo } from './../model/profile';
+import { Photo, UserActivity } from './../model/profile';
 import { User, UserFormValues } from './../model/user';
 import { store } from './../stores/store';
 import { Activity, ActivityFormValues } from './../model/activity';
@@ -107,6 +107,8 @@ const Profiles = {
   updateFollowing: (username: string) => requests.post<void>(`/follow/${username}`, {}),
   listFollowings: (usernmae: string, predicate: string) =>
     requests.get<Profile[]>(`/follow/${usernmae}?predicate=${predicate}`),
+  listActivities: (username: string, predicate: string) =>
+    requests.get<UserActivity[]>(`/profiles/${username}/activities?predicate=${predicate}`),
 };
 
 const agent = {

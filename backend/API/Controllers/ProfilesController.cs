@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Application.Profiles;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,12 @@ namespace API.Controllers
                 Username = username
             };
             return HandleResult(await Mediator.Send(query));
+        }
+
+        [HttpGet("{username}/activities")]
+        public async Task<IActionResult> GetUserActivities(string username, [FromQuery] string predicate)
+        {
+            return HandleResult(await Mediator.Send(new ListActivities.Query { Username = username, Predicate = predicate }));
         }
 
         [HttpPut]
