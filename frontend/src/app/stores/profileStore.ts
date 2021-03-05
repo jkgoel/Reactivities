@@ -14,7 +14,6 @@ export default class ProfileStore {
   loadingFollowing = false;
   activeTab = 0;
   userActivities: UserActivity[] = [];
-  activeSubTab = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -25,20 +24,6 @@ export default class ProfileStore {
         if (activeTab === 3 || activeTab === 4) {
           const predicate = activeTab === 3 ? 'followers' : 'following';
           this.loadFollowings(predicate);
-        } else if (activeTab === 2) {
-          this.loadActivities(this.activityPredicate);
-        } else {
-          this.followings = [];
-          this.userActivities = [];
-        }
-      }
-    );
-
-    reaction(
-      () => this.activeSubTab,
-      (activeSubTab) => {
-        if (this.activeTab === 2) {
-          this.loadActivities(this.activityPredicate);
         } else {
           this.userActivities = [];
         }
@@ -49,13 +34,6 @@ export default class ProfileStore {
   setActiveTab = (activeTab: any) => {
     this.activeTab = activeTab;
   };
-  setActiveSubTab = (activeSubTab: any) => {
-    this.activeSubTab = activeSubTab;
-  };
-
-  get activityPredicate() {
-    return this.activeSubTab === 0 ? 'future' : this.activeSubTab === 1 ? 'past' : 'hosting';
-  }
 
   get isCurrentUser() {
     if (store.userStore.user && this.profile) {
@@ -198,12 +176,12 @@ export default class ProfileStore {
     }
   };
 
-  loadActivities = async (predicate: string) => {
+  loadActivities = async (username: string, predicate?: string) => {
     this.loading = true;
     this.userActivities = [];
     try {
       if (this.profile) {
-        var activities = await agent.Profiles.listActivities(this.profile.username, predicate);
+        var activities = await agent.Profiles.listActivities(this.profile.username, predicate ?? 'future');
         runInAction(() => {
           activities.forEach((activity) => {
             activity.date = new Date(activity.date!);
