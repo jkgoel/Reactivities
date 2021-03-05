@@ -1,0 +1,36 @@
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import { Button, Grid, Header, Tab } from 'semantic-ui-react';
+import { useStore } from 'src/app/stores/store';
+import ProfileEditForm from './ProfileEditForm';
+
+export default observer(function ProfileAbout() {
+  const { profileStore } = useStore();
+  const { isCurrentUser, profile } = profileStore;
+  const [editMode, setEditMode] = useState(false);
+
+  return (
+    <Tab.Pane>
+      <Grid>
+        <Grid.Column width={16}>
+          <Header icon='user' content={`About ${profile?.displayName}`} floated='left' />
+          {isCurrentUser && (
+            <Button
+              floated='right'
+              basic
+              content={editMode ? 'Cancel' : 'Edit Profile'}
+              onClick={() => setEditMode(!editMode)}
+            />
+          )}
+        </Grid.Column>
+        <Grid.Column width={16}>
+          {editMode ? (
+            <ProfileEditForm setEditMode={setEditMode} />
+          ) : (
+            <div style={{ whiteSpace: 'pre-wrap' }}>{profile?.bio}</div>
+          )}
+        </Grid.Column>
+      </Grid>
+    </Tab.Pane>
+  );
+});

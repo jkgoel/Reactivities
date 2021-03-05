@@ -15,5 +15,11 @@ namespace API.Controllers
             };
             return HandleResult(await Mediator.Send(query));
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProfile([FromBody] Edit.Command command)
+        {
+            return HandleResult(await Mediator.Send(command));
+        }
     }
 }
