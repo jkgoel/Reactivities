@@ -34,23 +34,18 @@ namespace Application.Profiles
 
             public async Task<Result<List<UserActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var query = _context.Activities.Include(a => a.Attendees)
-                    .Where(x => x.Attendees.Any(u => u.AppUser.UserName == request.Username))
-                    .OrderBy(d => d.Date)
+                var query = _context.ActivityAttendees
+                    .Where(x => x.AppUser.UserName == request.Username)
+                    .OrderBy(d => d.Activity.Date)
+                    .ProjectTo<UserActivityDto>(_mapper.ConfigurationProvider)
                     .AsQueryable();
 
 
                 var activities = request.Predicate switch
                 {
-                    "past" => await query.Where(a => a.Date < DateTime.UtcNow)
-                                         .ProjectTo<UserActivityDto>(_mapper.ConfigurationProvider)
-                                         .ToListAsync(),
-                    "future" => await query.Where(a => a.Date >= DateTime.UtcNow)
-                                           .ProjectTo<UserActivityDto>(_mapper.ConfigurationProvider)
-                                           .ToListAsync(),
-                    "hosting" => await query.Where(a => a.Attendees.Any(u => u.IsHost))
-                                            .ProjectTo<UserActivityDto>(_mapper.ConfigurationProvider)
-                                            .ToListAsync(),
+                    "past" => await query.Where(a => a.Date < DateTime.UtcNow).ToListAsync(),
+                    "future" => await query.Where(a => a.Date >= DateTime.UtcNow).ToListAsync(),
+                    "hosting" => await query.Where(a => a.HostUsername == request.Username).ToListAsync(),
                     _ => null
                 };
 
