@@ -21,7 +21,6 @@ export default class ActivityStore {
     reaction(
       () => this.predicate.keys(),
       () => {
-        console.log('inside reaction');
         this.pagingParams = new PagingParams();
         this.activityRegistry.clear();
         this.loadActivities();
@@ -32,14 +31,13 @@ export default class ActivityStore {
   setPagingParams = (pagingParam: PagingParams) => (this.pagingParams = pagingParam);
 
   get axiosParams() {
-    console.log('inside axioparams');
     const params = new URLSearchParams();
     params.append('pageNumber', this.pagingParams.pageNumber.toString());
     params.append('pageSize', this.pagingParams.pageSize.toString());
     this.predicate.forEach((value, key) => {
       if (key === 'startDate') {
         const date = (value as Date).toISOString();
-        console.log('ISOString', date);
+
         params.append(key, date);
       } else {
         params.append(key, value);

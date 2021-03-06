@@ -16,11 +16,10 @@ export const history = createBrowserHistory();
 
 ReactDOM.render(
   <Router history={history}>
-    <ScrollToTop>
-      <StoreContext.Provider value={store}>
-        <App />
-      </StoreContext.Provider>
-    </ScrollToTop>
+    <ScrollToTop />
+    <StoreContext.Provider value={store}>
+      <App />
+    </StoreContext.Provider>
   </Router>,
   document.getElementById('root')
 );

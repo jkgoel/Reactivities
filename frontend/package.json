@@ -38,6 +38,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "rmdir ..\\backend\\API\\wwwroot /s /q && move build ..\\backend\\API\\wwwroot",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

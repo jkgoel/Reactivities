@@ -12,11 +12,11 @@ import NotFound from '../../features/errors/NotFound';
 import { ToastContainer } from 'react-toastify';
 import TestErrors from 'src/features/errors/TestError';
 import ServerError from 'src/features/errors/ServerError';
-import LoginForm from 'src/features/users/LoginForm';
 import { useStore } from '../stores/store';
 import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modal/ModalContainer';
 import ProfilePage from 'src/features/profiles/ProfilePage';
+import PrivateRoute from './PrivateRoute';
 
 function App() {
   const location = useLocation();
@@ -43,13 +43,12 @@ function App() {
             <NavBar />
             <Container style={{ paddingTop: '7em' }}>
               <Switch>
-                <Route path='/activities' component={ActivityDashboard} exact />
-                <Route path='/activities/:id' component={ActivityDetails} />
-                <Route path={['/createActivity', '/manage/:id']} component={ActivityForm} key={location.key} />
-                <Route path='/profiles/:username' component={ProfilePage} />
-                <Route path='/errors' component={TestErrors} />
+                <PrivateRoute path='/activities' component={ActivityDashboard} exact />
+                <PrivateRoute path='/activities/:id' component={ActivityDetails} />
+                <PrivateRoute path={['/createActivity', '/manage/:id']} component={ActivityForm} key={location.key} />
+                <PrivateRoute path='/profiles/:username' component={ProfilePage} />
+                <PrivateRoute path='/errors' component={TestErrors} />
                 <Route path='/server-error' component={ServerError} />
-                <Route path='/login' component={LoginForm} />
                 <Route component={NotFound} />
               </Switch>
             </Container>
