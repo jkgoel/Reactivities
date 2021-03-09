@@ -9,3 +9,5 @@ appsettings.json
 **/.eslintcache
 **/.idea
 
+backend/.vs/Reactivities/v16/.suo
+backend/API/API.csproj.user
