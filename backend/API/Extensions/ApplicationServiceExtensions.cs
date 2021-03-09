@@ -69,7 +69,7 @@ namespace API.Extensions
                     .AllowAnyMethod()
                     .AllowCredentials()
                     .WithExposedHeaders("WWW-Authenticate", "Pagination")
-                    .WithOrigins("http://localhost:3000");
+                    .WithOrigins("http://localhost:3000", "http://jktech-reactivities.herokuapp.com");
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
