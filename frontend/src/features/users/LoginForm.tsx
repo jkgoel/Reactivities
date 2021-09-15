@@ -18,7 +18,7 @@ export default observer(function LoginForm() {
         userStore
           .login(values)
           .then(() => loadActivities())
-          .catch((error) => setErrors({ error: 'Invalid email for password' }))
+          .catch((error) => setErrors({ error: error.response.data }))
       }>
       {({ handleSubmit, isSubmitting, errors }) => (
         <Form className='ui form' onSubmit={handleSubmit}>
