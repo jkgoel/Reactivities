@@ -1,5 +1,4 @@
 bin
-obj
 .vscode
 appsettings.json
 .DS_Store
@@ -11,3 +10,6 @@ appsettings.json
 
 backend/.vs/Reactivities/v16/.suo
 backend/API/API.csproj.user
+/backend/**/obj/Debug/net5.0
+/backend/**/obj/Release/net5.0
+**/.vs/Reactivities/DesignTimeBuild
